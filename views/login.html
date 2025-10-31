@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        #error-msg{
+            color: red;
+
+        }
+    </style>
+    
+    <form>
+        <label for="email1">Enter your email</label>
+        <input type="email" id="email1">
+        <label for="password1">Enter your password</label>
+        <input type="password" id="password1">
+        <button type="submit">Login</button>
+    </form>
+    <a href="./signup.html">New User-Signup Now</a><br>
+    <a href="./forgetpassword.html">forget password</a>
+    <div id="error-msg"></div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded',()=>{
+        resetform()
+          const div=document.getElementById('error-msg')
+          div.textContent=''
+    })
+      function resetform(){
+  
+    document.getElementById('email1').value=''
+    document.getElementById('password1').value=''
+ 
+
+   }
+    const form=document.querySelector('form')
+    form.addEventListener('submit',async (event)=>{
+        try{
+            event.preventDefault()
+        const email=document.getElementById('email1').value
+        const password=document.getElementById('password1').value
+        const obj={email,password}
+        const result=await axios.post('http://localhost:3000/users/login',obj)
+        alert(result.data.message)
+        resetform()
+          const div=document.getElementById('error-msg')
+          div.textContent=''
+        console.log(result)
+          
+           localStorage.setItem('token',result.data.token)
+            window.location.href = "expense.html"; 
+        }
+        catch(err){
+            console.log(err)
+            if(err.status==400 || err.status==404 || err.status==401){
+                const div=document.getElementById('error-msg')
+                div.textContent=`Error:${err.response.data.message}`
+                resetform()
+            }
+        }
+        
+
+    })
+</script>
+</html>

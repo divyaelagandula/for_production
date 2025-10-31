@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    #premium {
+        background-color: green;
+        height: 30px;
+
+    }
+</style>
+
+<body>
+    <button id="premium">By Premium Membership</button>
+    <label for="numberOfExpensesPerPage">number of expenses per PAGE</label>
+    <select id="numberOfExpensesPerPage" name="count">
+       <option value="0" selected>0</option>
+       <option value="2">2</option>
+            <option value="5">5</option>
+        <option value="10" >10</option>
+    </select>
+    <form>
+
+        <label for="amount">Enter amount</label>
+        <input type="number" id="amount">
+        <label for="description">Enter description</label>
+        <input type="text" id="description">
+        
+
+
+        <button type="submit">add expense</button>
+    </form>
+    <p id="memeber"></p>
+       <button style='display: none;' id="leadership">ShowLeaderBoard</button>
+    
+    <button  style='display: none;' id="download" onclick="download()">download expenses</button>
+    <div id="downloadButtonsErrors"></div>
+    <ul id="expense-details"></ul>
+    <div id="pigination-buttons"></div>
+    <h2 style="display: none;" id="leaderBoard">Leader Board</h2>
+    <ul id="userstotalamount"></ul>
+    <ul id="downloadhistory"></ul>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+
+<script>
+    let usedpage=1
+    const pagecount=document.getElementById('numberOfExpensesPerPage')
+    
+    pagecount.addEventListener('change',()=>{
+       
+        getexpenses()
+    })
+
+    const token = localStorage.getItem('token')
+    document.addEventListener('DOMContentLoaded', async () => {
+        resetform()
+
+        checkingUserPremiumOrNot()
+        downloadhistory()
+        const limit=document.getElementById('numberOfExpensesPerPage').value
+        axios.get(`http://localhost:3000/expense/getexpenses?usedpage=${usedpage}&limit=${limit}`, { headers: { 'authorization': token } })
+            .then((result) => {
+                console.log(result)
+                const list=result.data.result
+                 showexpenses(list)
+                console.log('number of expenses',list.length)
+                if(list.length!=0){
+                 showpagination(result.data.buttondetails)
+                }
+                else{
+                     const pigination_buttons = document.getElementById('pigination-buttons')
+        pigination_buttons.innerHTML = ''
+                }
+               
+            })
+            .catch((err)=>{
+                console.log(err)
+            })
+    })
+function resetform() {
+
+        document.getElementById('amount').value = ''
+        document.getElementById('description').value = ''
+
+
+    }
+    const form = document.querySelector('form')
+    form.addEventListener('submit', async (event) => {
+        try {
+            event.preventDefault()
+
+            const amount = document.getElementById('amount').value
+            const description = document.getElementById('description').value
+
+            const obj = { amount, description }
+            const result = await axios.post('http://localhost:3000/expense/addexpense', obj, { headers: { 'authorization': token } })
+            console.log(result)
+            alert(result.data.message)
+            resetform()
+            // getexpenseDetails()
+            getexpenses()
+
+
+        }
+        catch (err) {
+            console.log(err)
+            if (err.status == 400) {
+                alert(err.message)
+            }
+        }
+
+    })
+    // async function getexpenseDetails(){
+
+    //     try{
+
+    //         const result= await axios.get('http://localhost:3000/expense/getexpenses',{headers:{'authorization':token}})
+    //         const expenses=result.data
+    //         const ul=document.querySelector('ul')
+    //         ul.innerHTML=''
+    //         for(const expense of expenses){
+    //             const li=document.createElement('li')
+    //             li.innerHTML=`${expense.amount}-${expense.description}-${expense.category}`
+    //             const button=document.createElement('button')
+    //             button.textContent='Delete expense'
+    //             button.onclick=()=>{
+    //                 deleteExpense(expense.id)
+    //             }
+    //             li.appendChild(button)
+    //             ul.appendChild(li)
+
+    //         }
+
+    //     }
+    //     catch(err){
+    //         console.log(err)
+    //     }
+
+    // }
+    function showexpenses(expenses) {
+        const ul = document.querySelector('ul')
+        ul.innerHTML = ''
+        for (const expense of expenses) {
+            const li = document.createElement('li')
+            li.innerHTML = `${expense.amount}-${expense.description}-${expense.category}`
+            const button = document.createElement('button')
+            button.textContent = 'Delete expense'
+            button.onclick = () => {
+                deleteExpense(expense.id,li)
+            }
+            li.appendChild(button)
+            ul.appendChild(li)
+
+        }
+
+    }
+    function showpagination({ currentpage, hasnextpage, haspreviouspage, nextpage, previouspage, totalpages }) {
+        const pigination_buttons = document.getElementById('pigination-buttons')
+        pigination_buttons.innerHTML = ''
+        if (haspreviouspage) {
+            const button1 = document.createElement('button')
+            button1.innerText = previouspage
+            button1.addEventListener('click', () => {
+                usedpage=previouspage
+                getexpenses()
+            })
+            pigination_buttons.appendChild(button1)
+
+        }
+        const button2 = document.createElement('button')
+        button2.innerHTML= `<h1>${currentpage}</h1>`
+        button2.addEventListener('click', () => {
+            usedpage=currentpage
+            getexpenses()
+        })
+        pigination_buttons.appendChild(button2)
+        if (hasnextpage) {
+            const button3 = document.createElement('button')
+            button3.innerText = nextpage
+            button3.addEventListener('click', () => {
+                usedpage=nextpage
+                getexpenses(nextpage)
+            })
+            pigination_buttons.appendChild(button3)
+        }
+
+    }
+    function getexpenses(){
+          const limit=document.getElementById('numberOfExpensesPerPage').value
+         axios.get(`http://localhost:3000/expense/getexpenses?usedpage=${usedpage}&limit=${limit}`, { headers: { 'authorization': token } })
+            .then((result) => {
+                console.log(result)
+                showexpenses(result.data.result)
+                const list=result.data.result
+                console.log('number of expenses',list.length)
+                  if(list.length!=0){
+                 showpagination(result.data.buttondetails)
+                }
+                else{
+                     const pigination_buttons = document.getElementById('pigination-buttons')
+        pigination_buttons.innerHTML = ''
+                }
+            })
+            .catch((err)=>{
+                console.log(err)
+            })
+    }
+    async function deleteExpense(id,li) {
+        try {
+            const token = localStorage.getItem('token')
+            const result = await axios.delete(`http://localhost:3000/expense/deleteexpense/${id}`, { headers: { 'authorization': token } })
+            console.log(result)
+            li.remove()
+            alert(result.data.message)
+            getexpenses(1)
+
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+    const cashfree = Cashfree({
+        mode: "sandbox",
+    });
+
+    const premium = document.getElementById('premium')
+    premium.addEventListener('click', async () => {
+        try {
+            const response = await axios.post('http://localhost:3000/membership/pay')
+
+
+
+
+            const paymentSessionId = response.data.paymentSessionId;
+            const orderId = response.data.orderId;
+            console.log(paymentSessionId, orderId)
+
+            // Initialize checkout options
+            let checkoutOptions = {
+                paymentSessionId: paymentSessionId,
+
+                //? Modal payment options
+                redirectTarget: "_modal",
+            };
+
+            // Start the checkout process
+            const result = await cashfree.checkout(checkoutOptions);
+
+            if (result.error) {
+                // This will be true whenever user clicks on close icon inside the modal or any error happens during the payment
+                console.log("User has closed the popup or there is some payment error, Check for Payment Status");
+                console.log(result.error);
+            }
+            if (result.redirect) {
+                // This will be true when the payment redirection page couldn't be opened in the same window
+                // This is an exceptional case only when the page is opened inside an inAppBrowser
+                // In this case the customer will be redirected to return url once payment is completed
+                console.log("Payment will be redirected");
+            }
+            if (result.paymentDetails) {
+                // This will be called whenever the payment is completed irrespective of transaction status
+                console.log("Payment has been completed, Check for Payment Status");
+                console.log(result.paymentDetails.paymentMessage);
+                const token = localStorage.getItem('token')
+
+                const response = await axios.get(`http://localhost:3000/membership/payment-status/${orderId}`, { headers: { 'authorization': token } })
+
+
+                alert("Your payment is " + response.data.orderStatus)
+                checkingUserPremiumOrNot()
+            }
+
+
+        } catch (err) {
+            console.error("Error:", err);
+        }
+
+    })
+    async function checkingUserPremiumOrNot() {
+        try {
+            const token = localStorage.getItem('token')
+            const result = await axios.get('http://localhost:3000/premium/checking', { headers: { 'authorization': token } })
+            console.log(result.data.userResult)
+            if (result.data.userResult.membershipStatus === 'true') {
+                const leadership = document.getElementById('leadership')
+                leadership.style.display = 'block'
+                const download=document.getElementById('download')
+                download.style.display='block'
+                const premium = document.getElementById('premium')
+                premium.style.display = 'none'
+                const para = document.getElementById('memeber')
+                para.style.color = 'red'
+                para.textContent = 'Your a premium memeber'
+                leadership.addEventListener('click', () => {
+                    accesendingOrderExpenses()
+                })
+            }
+        }
+        catch (err) {
+            console.log(err)
+        }
+
+    }
+    async function accesendingOrderExpenses() {
+        try {
+            const result = await axios.get('http://localhost:3000/premium/leaderBoard')
+            console.log(result.data.userexpenses)
+            const users_amount = result.data.userexpenses
+            const heading = document.getElementById('leaderBoard')
+            heading.style.display = 'block'
+            const ul = document.getElementById('userstotalamount')
+            ul.textContent = ''
+            for (let useramount of users_amount) {
+                const li = document.createElement('li')
+                li.innerHTML = `NAME - ${useramount.name},Total Expense -${useramount.totalamount}`
+                ul.appendChild(li)
+            }
+
+        }
+        catch (err) {
+            console.log(err)
+        }
+
+
+
+
+    }
+    function download() {
+        axios.get("http://localhost:3000/expense/download", { headers: { 'authorization': token } })
+        .then((result)=>{
+            if(result.status==200){
+                const a=document.createElement('a')
+                a.href=result.data.fileurl
+                a.download='expenses.txt'
+                a.click()
+            }
+        })
+        .catch((err)=>{
+            console.log(err)
+            const downloadButtonsErrors=document.getElementById('downloadButtonsErrors')
+            downloadButtonsErrors.innerHTML=`Error:${err.response.data.error}`
+            downloadButtonsErrors.style.color='red'
+        })
+        
+    }
+    async function downloadhistory(){
+        try{
+            const result=await axios.get("http://localhost:3000/expense/getDownloadHistory", { headers: { 'authorization': token } })
+            const list=result.data.history
+            console.log('list',list)
+            const downloadhistory=document.getElementById('downloadhistory')
+            downloadhistory.textContent=''
+            for(let obj of list){
+                const li=document.createElement('li')
+            li.innerHTML = `<a href='${obj.url}' target='_blank'>${obj.url}</a>`
+                downloadhistory.appendChild(li)
+
+            }
+        
+        }
+        catch(err){
+            console.log(err)
+        }
+
+    }
+
+</script>
+
+</html>
