@@ -1,6 +1,7 @@
  const { Cashfree, CFEnvironment } = require("cashfree-pg");
-
-const cashfree = new Cashfree(CFEnvironment.SANDBOX, "TEST108424737d52ebab4e83efef6a4637424801", "cfsk_ma_test_3c09f52f6afec1937e955a195f34524c_f53f915d");
+const CF_CLIENT_ID = process.env.CASHFREE_CLIENT_ID;
+const CF_SECRET_KEY = process.env.CASHFREE_SECRET_KEY;
+const cashfree = new Cashfree(CFEnvironment.SANDBOX,CF_CLIENT_ID,CF_SECRET_KEY);
 
    
 const path = require("path");
