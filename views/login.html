@@ -26,6 +26,8 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+        const ipaddress=`http://${window.location.hostname}:3000`
+
     document.addEventListener('DOMContentLoaded',()=>{
         resetform()
           const div=document.getElementById('error-msg')
@@ -45,7 +47,7 @@
         const email=document.getElementById('email1').value
         const password=document.getElementById('password1').value
         const obj={email,password}
-        const result=await axios.post('http://localhost:3000/users/login',obj)
+        const result=await axios.post(`${ipaddress}/users/login`,obj)
         alert(result.data.message)
         resetform()
           const div=document.getElementById('error-msg')

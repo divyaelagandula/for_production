@@ -31,6 +31,8 @@
     <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
 <script>
+        const ipaddress=`http://${window.location.hostname}:3000`
+
     document.addEventListener('DOMContentLoaded',()=>{
         resetform()
     })
@@ -42,7 +44,7 @@
     const email=document.getElementById('email').value
     const password=document.getElementById('password').value
     const obj={name,email,password}
-    const result=await axios.post('http://localhost:3000/users/signup',obj)
+    const result=await axios.post(`${ipaddress}/users/signup`,obj)
     alert('data added to database succesfully')
     console.log(result)
     resetform()

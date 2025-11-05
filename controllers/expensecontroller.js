@@ -210,7 +210,6 @@ async function uploadToS3(data, filename) {
     }
     
 }
-// Example GET endpoint handler
 const getDownloadHistory = async (req, res) => {
     try {
         const history = await downloadedurls.findAll({
