@@ -6,25 +6,55 @@
     <title>User Signup</title>
 </head>
 <style>
-    #error-msg{
-        display: none;
+        /* * 1. Set body height to 100% of the viewport.
+         * 2. Use Flexbox to align content both horizontally (center) and vertically (center).
+         */
+       body{
+        height: 100vh;
+        display: flex ;
+        justify-content: center;
+        align-items: center;
+        background-color: lightgrey;
+        font-family: Arial, sans-serif;
+       }
+      label, input,button{
+        display: block;
+        font-size: 14px;
+      }
+      form{
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      input{
+        margin-top: 5px;
+        padding: 8px;   
+        width: 300px;
+        margin-bottom: 15px;
+      }
+      #error-msg{
+        display: none;  
         color: red;
     }
-</style>
+    </style>
+
 <body>
    <form >
+    <h1>Expense Tracker</h1>
     <label for="name">Enter name</label>
-    <input type="text" id="name" ><br><br>
+    <input type="text" id="name" >
 
     <label for="email">Enter email</label>
-    <input type="email" id="email" ><br><br>
+    <input type="email" id="email" >
     <label for="password">Enter password</label>
-    <input type="password" id="password" ><br><br>
+    <input type="password" id="password" >
 
     <button type="submit">Signup</button>
-</form>
-<a href="./login.html">Existing User-login</a>
+    <a href="./login.html">Existing User-login</a>
 <div id="error-msg"></div>
+</form>
+
 
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

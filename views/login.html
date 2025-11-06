@@ -6,11 +6,38 @@
     <title>Document</title>
 </head>
 <body>
-    <style>
-        #error-msg{
-            color: red;
-
-        }
+   <style>
+        /* * 1. Set body height to 100% of the viewport.
+         * 2. Use Flexbox to align content both horizontally (center) and vertically (center).
+         */
+       body{
+        height: 100vh;
+        display: flex ;
+        justify-content: center;
+        align-items: center;
+        background-color: lightgrey;
+        font-family: Arial, sans-serif;
+       }
+      label, input,button,a{
+        display: block;
+        font-size: 14px;
+      }
+      form{
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      input{
+        margin-top: 5px;
+        padding: 8px;   
+        width: 300px;
+        margin-bottom: 15px;
+      }
+      #error-msg{
+        display: none;  
+        color: red;
+    }
     </style>
     
     <form>
@@ -18,11 +45,12 @@
         <input type="email" id="email1">
         <label for="password1">Enter your password</label>
         <input type="password" id="password1">
-        <button type="submit">Login</button>
-    </form>
-    <a href="./signup.html">New User-Signup Now</a><br>
-    <a href="./forgetpassword.html">forget password</a>
+        <button type="submit">Login</button><br>
+        <a href="./signup.html">New User-Signup Now</a><br>
+    <a href="./forgetpassword.html">forget password</a><br>
     <div id="error-msg"></div>
+    </form>
+   
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
