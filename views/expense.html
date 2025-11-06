@@ -9,28 +9,29 @@
 <style>
     #premium {
         background-color: green;
-        height: auto;
+        height: 30px;
 
     }
 </style>
 
 <body>
-    
-    <form>
-        <button id="premium">By Premium Membership</button><br><br>
+    <button id="premium">By Premium Membership</button><br><br>
     <label for="numberOfExpensesPerPage">number of expenses per PAGE</label>
     <select id="numberOfExpensesPerPage" name="count">
         <option value="0" selected>0</option>
         <option value="2">2</option>
         <option value="5">5</option>
         <option value="10">10</option>
-    </select><br><br>
+    </select>
+    <form>
+
         <label for="amount">Enter amount</label>
-        <input type="number" id="amount"><br>
+        <input type="number" id="amount">
         <label for="description">Enter description</label>
-        <input type="text" id="description"><br>
+        <input type="text" id="description">
         <button type="submit">add expense</button>
-          <p id="memeber"></p>
+    </form>
+    <p id="memeber"></p>
     <button style='display: none;' id="leadership">ShowLeaderBoard</button><br>
 
     <button style='display: none;' id="download" onclick="download()">download expenses</button>
@@ -40,8 +41,6 @@
     <h2 style="display: none;" id="leaderBoard">Leader Board</h2>
     <ul id="userstotalamount"></ul>
     <ul id="downloadhistory"></ul>
-    </form>
-  
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
@@ -350,7 +349,7 @@
             downloadhistory.textContent = ''
             for (let obj of list) {
                 const li = document.createElement('li')
-                li.innerHTML = `<a href='${obj.url}' target='_blank'>${obj.fileName}</a>`
+                li.innerHTML = `<a href='${obj.url}' target='_blank'>${obj.url}</a>`
                 downloadhistory.appendChild(li)
 
             }
