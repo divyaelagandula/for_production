@@ -1,6 +1,7 @@
 const users=require('../models/users')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
+const redisClient=require('../utilss/redis')
 function isnotvalid(string){
     if(string==undefined||string.length==0){
         return true
@@ -100,7 +101,40 @@ const login=async (req,res)=>{
         res.status(500).json({succeses:false,message:err})
     }
 }
+const logout=async (req,res)=>{
+    try {
+        // 1. Decode the token to get its expiration time (exp)
+        const decodedToken = jwt.decode(token);
+        if (!decodedToken || !decodedToken.exp) {
+             return res.status(400).json({ success: false, message: 'Token decode failed.' });
+        }
+
+        const expirationTime = decodedToken.exp; // Unix timestamp in seconds
+        
+        // Calculate TTL (Time-To-Live) in seconds: (Expiry Time - Current Time)
+        const ttl = expirationTime - Math.floor(Date.now() / 1000); 
+
+        // Ensure TTL is a positive number
+        if (ttl <= 0) {
+            return res.status(200).json({ success: true, message: 'Token already expired.' });
+        }
+
+        // 2. Add the token to Redis Block List with the calculated TTL
+        redisClient.set(token, 'blocked', {EX: ttl}).then(() => {
+             // 3. Success response
+             res.status(200).json({ success: true, message: 'Logged out successfully. Token revoked.' });
+        }).catch(err => {
+            console.error('Redis Block Error:', err);
+            res.status(500).json({ success: false, message: 'Server failed to revoke token.' });
+        });
+
+    } catch (error) {
+        console.error('Logout Error:', error);
+        res.status(500).json({ success: false, message: 'Server error during logout.' });
+    }
+}
 module.exports={
     signup,
-    login
+    login,
+    logout
 }

@@ -8,6 +8,7 @@ const paymentroutes=require('./routes/paymentroutes')
 const premiumroutes=require('./routes/premiumroutes')
 const resetPasswordRoutes = require('./routes/restpasswd')
 const db = require('./utilss/db-connection'); 
+const redisClient=require('./utilss/redis')
 const fs=require('fs')
 const https=require('https')
 const cors = require('cors');
@@ -21,7 +22,7 @@ const app = express();
 app.use(express.json()); 
 app.use(cors());
 
-    app.use(compression());
+    // app.use(compression());
 
 // 1. Static File Serving (Crucial for opening login.html)
 // This serves all files (HTML, CSS, JS) from the 'views' directory automatically.

@@ -41,13 +41,14 @@ const addexpense = async (req, res) => {
         if (isnotvalid(amount) || isnotvalid(description)) {
             res.status(400).json({ message: 'amount and description must to fill' })
         }
-        const result = await expenses.create({ amount, description, 'category': category, 'userId': req.user.id }, { transaction: transaction })
+        const result = await expenses.create({ amount, description, 'category': category, 'userId': req.user.userid}, { transaction: transaction })
+        const user = await users.findByPk(req.user.userid, { transaction: transaction })
         const [affectedRowsCount] = await users.update(
             {
-                totalamount: Number(req.user.totalamount) + Number(amount)
+                totalamount: Number(user.totalamount) + Number(amount)
             },
             {
-                where: { id: req.user.id },
+                where: { id: req.user.userid},
                 transaction: transaction
             }
         );
@@ -73,11 +74,11 @@ const getexpenses = async (req, res) => {
     try {
         const usedpage = Number(req.query.usedpage)
         const limit = Number(req.query.limit)
-        const totalexpenses = await expenses.count({ where: { userId: req.user.id } })
+        const totalexpenses = await expenses.count({ where: { userId: req.user.userid} })
         console.log('tttttttttt', totalexpenses)
         const result = await expenses.findAll({
 
-            where: { userId: req.user.id }, // Filter by the authenticated user
+            where: { userId: req.user.userid}, // Filter by the authenticated user
             limit: limit,         // The number of records to return
             offset: (usedpage - 1) * limit,
             raw: true          // The number of records to skip
@@ -112,7 +113,7 @@ const deleteexpense = async (req, res) => {
         // 2. Find the expense *within* the transaction to get the amount
         // Also ensure it belongs to the current user
         const expenseToDelete = await expenses.findOne({
-            where: { id: id, userId: req.user.id },
+            where: { id: id, userId: req.user.userid },
             transaction: transaction
         });
 
@@ -132,12 +133,13 @@ const deleteexpense = async (req, res) => {
         }); // 'result' here will be 1 (success) since we already checked for existence
 
         // 5. Update the user's totalamount *within* the transaction
+        const user = await users.findByPk(req.user.userid, { transaction: transaction });
         const [affectedRowsCount] = await users.update(
             {
-                totalamount: Number(req.user.totalamount) - Number(amount)
+                totalamount: Number(user.totalamount) - Number(amount)
             },
             {
-                where: { id: req.user.id },
+                where: { id: req.user.userid},
                 transaction: transaction // Use the transaction
             }
         );
@@ -160,7 +162,7 @@ const deleteexpense = async (req, res) => {
 }
 const download = async (req, res) => {
     try {
-        const response = await expenses.findAll({ where: { userId: req.user.id } })
+        const response = await expenses.findAll({ where: { userId: req.user.userid} })
         const reponseinstring = JSON.stringify(response)
         const filename = `expense${req.user.id}-${new Date()}.txt`
         const url = await uploadToS3(reponseinstring, filename)
@@ -169,7 +171,7 @@ const download = async (req, res) => {
             url:url,
             fileName:filename,
             downloadeAt:new Date(),
-            userId:req.user.id
+            userId:req.user.userid
         })
         if(url.error){
             throw new Error(`${url.error}`)
@@ -213,7 +215,7 @@ async function uploadToS3(data, filename) {
 const getDownloadHistory = async (req, res) => {
     try {
         const history = await downloadedurls.findAll({
-            where: { userId: req.user.id },
+            where: { userId: req.user.userid },
             order: [['downloadeAt', 'DESC']] // Show most recent first
         });
         console.log('neeeeeewwwww',history)

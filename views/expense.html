@@ -4,48 +4,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Expense  Tracker</track></title>
 </head>
-<style>
-    #premium {
-        background-color: green;
-        height: 30px;
+    <style>
+        /* 1. Global Reset and Typography */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            /* Light gray background */
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-    }
-</style>
+        /* 2. Main Container */
+        .main-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #17a2b8;
+            border-bottom: 2px solid #17a2b8;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        /* 3. Button Styling */
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s;
+            text-transform: uppercase;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Premium Button - Distinctive Success Style */
+        #premium {
+            background-color: #28a745;
+            /* Green color */
+            color: white;
+            height: 40px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        #premium:hover {
+            background-color: #1e7e34;
+        }
+
+        /* Action Group: Download & Leaderboard */
+        .action-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #leadership,
+        #download {
+            background-color: #6c757d;
+            color: white;
+            /* Reset inline style */
+            display: inline-block !important; 
+        }
+
+        #leadership:hover,
+        #download:hover {
+            background-color: #5a6268;
+        }
+
+        /* Logout Button */
+        #logout-btn {
+            background-color: #dc3545;
+            /* Red for logout */
+            color: white;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+
+        #logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* 4. Expense Form */
+        form {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr 2fr auto;
+            /* Adjust layout */
+            gap: 15px;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            margin-bottom: 20px;
+        }
+        
+        /* Make the submit button span to the end */
+        form button[type="submit"] {
+            grid-column: 5 / 6; 
+            background-color: #007bff;
+            color: white;
+            margin: 0;
+        }
+
+        form button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        form label {
+            font-weight: 600;
+            color: #555;
+            white-space: nowrap; /* Prevent label wrapping */
+        }
+
+        form input[type="number"],
+        form input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* 5. Expense List and Details */
+        #expense-details,
+        #userstotalamount,
+        #downloadhistory {
+            list-style-type: none;
+            padding: 0;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        #expense-details li,
+        #userstotalamount li,
+        #downloadhistory li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border-left: 5px solid #007bff;
+            /* Primary color accent */
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            font-size: 15px;
+        }
+
+        #expense-details li button {
+            background-color: #ffc107;
+            /* Warning color for delete */
+            color: #333;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        #expense-details li button:hover {
+            background-color: #e0a800;
+        }
+        
+        /* Premium Member Status */
+        #memeber {
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            background-color: #ffe5e5; /* Light red background for status */
+            color: #dc3545; /* Dark red text */
+            text-align: center;
+        }
+
+        /* Pagination */
+        #pigination-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        #pigination-buttons button {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+        }
+
+        #pigination-buttons button:hover {
+            background-color: #ced4da;
+        }
+        
+        /* Active Page */
+        #pigination-buttons button h1 {
+            font-size: 16px;
+            margin: 0;
+            padding: 0;
+            font-weight: bold;
+            color: #007bff; /* Highlight current page number */
+        }
+
+        /* Download History Links */
+        #downloadhistory li a {
+            color: #17a2b8;
+            text-decoration: none;
+        }
+        
+        #downloadButtonsErrors {
+            color: #dc3545;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        /* Expenses Per Page Selector */
+        #numberOfExpensesPerPage {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-left: 10px;
+            font-size: 14px;
+        }
+        
+        .expenses-per-page-controls {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
 
 <body>
-    <button id="premium">By Premium Membership</button><br><br>
-    <label for="numberOfExpensesPerPage">number of expenses per PAGE</label>
-    <select id="numberOfExpensesPerPage" name="count">
-        <option value="0" selected>0</option>
-        <option value="2">2</option>
-        <option value="5">5</option>
-        <option value="10">10</option>
-    </select>
-    <form>
+    <div class="main-container">
+        <h1>Expense Tracker Dashboard</h1>
+        
+        <button id="premium">Buy Premium Membership</button>
+        <p id="memeber"></p>
+        
+        <div class="action-group" style="display: none;">
+            <button id="leadership">Show Leader Board</button>
+            <button id="download" onclick="download()">Download Expenses</button>
+        </div>
+        
+        <div id="downloadButtonsErrors"></div>
+        
+        <div class="expenses-per-page-controls">
+            <label for="numberOfExpensesPerPage">Expenses per Page:</label>
+            <select id="numberOfExpensesPerPage" name="count">
+                <option value="0" selected>0</option>
+                <option value="2">2</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+            </select>
+        </div>
 
-        <label for="amount">Enter amount</label>
-        <input type="number" id="amount">
-        <label for="description">Enter description</label>
-        <input type="text" id="description">
-        <button type="submit">add expense</button>
-    </form>
-    <p id="memeber"></p>
-    <button style='display: none;' id="leadership">ShowLeaderBoard</button><br>
+        <form>
+            <label for="amount">Amount</label>
+            <input type="number" id="amount" required>
+            <label for="description">Description</label>
+            <input type="text" id="description" required>
+            <button type="submit">Add Expense</button>
+        </form>
 
-    <button style='display: none;' id="download" onclick="download()">download expenses</button>
-    <div id="downloadButtonsErrors"></div>
-    <ul id="expense-details"></ul>
-    <div id="pigination-buttons"></div>
-    <h2 style="display: none;" id="leaderBoard">Leader Board</h2>
-    <ul id="userstotalamount"></ul>
-    <ul id="downloadhistory"></ul>
-</body>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+        <h2>Your Expenses</h2>
+        <ul id="expense-details"></ul>
+        <div id="pigination-buttons"></div>
+
+        <h2 style="display: none;" id="leaderBoard">Leader Board</h2>
+        <ul id="userstotalamount"></ul>
+        
+        <h2 style="display: none;" id="downloadhistoryheading">Download History</h2>
+        <ul id="downloadhistory"></ul>
+
+        <button id="logout-btn">Logout</button>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
 <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+        // Redirect to the login page (assuming signup.html is where login is linked)
+        // You might want to change this to 'login.html' if you have one.
+        window.location.href = './signup.html';
+    }
     const ipaddress=`http://${window.location.hostname}:3000`
     let usedpage = 1
     const pagecount = document.getElementById('numberOfExpensesPerPage')
@@ -54,7 +313,30 @@
 
         getexpenses()
     })
-    const token = localStorage.getItem('token')
+    const logoutBtn = document.getElementById('logout-btn');
+    logoutBtn.addEventListener('click', async () => {
+            try {
+            // STEP 1: Call the backend /logout endpoint
+            const response = await axios.post(`${ipaddress}/users/logout`, null, {
+                headers: { 'authorization': `${token}` }
+            });
+          
+
+            console.log(response.data.message); // Should log "Logged out successfully. Token revoked."
+
+        } catch (error) {
+            console.error('Backend Logout Failed:', error);
+            // Even if the backend fails (e.g., Redis down), we still log the user out client-side
+        }
+            // BEST PRACTICE: Also call a backend /logout endpoint here
+            // to destroy the server-side session/token (not included in this frontend fix).
+               // Remove the token from client storage
+            localStorage.removeItem('token');
+            
+            // Redirect the user to the signup/login page
+            window.location.href = './signup.html';
+           
+        });
     document.addEventListener('DOMContentLoaded', async () => {
         resetform()
         checkingUserPremiumOrNot()
@@ -214,7 +496,9 @@
             console.log(result)
             li.remove()
             alert(result.data.message)
+            usedpage=1
             getexpenses()
+
 
         }
         catch (err) {
@@ -279,10 +563,8 @@
             const result = await axios.get(`${ipaddress}/premium/checking`, { headers: { 'authorization': token } })
             console.log(result.data.userResult)
             if (result.data.userResult.membershipStatus === 'true') {
-                const leadership = document.getElementById('leadership')
-                leadership.style.display = 'block'
-                const download = document.getElementById('download')
-                download.style.display = 'block'
+                const action_group=document.querySelector('.action-group')
+                action_group.style.display='block'  
                 const premium = document.getElementById('premium')
                 premium.style.display = 'none'
                 const para = document.getElementById('memeber')
@@ -345,6 +627,8 @@
             const result = await axios.get(`${ipaddress}/expense/getDownloadHistory`, { headers: { 'authorization': token } })
             const list = result.data.history
             console.log('list', list)
+            const downloadhistoryheading = document.getElementById('downloadhistoryheading')
+            downloadhistoryheading.style.display = 'block'
             const downloadhistory = document.getElementById('downloadhistory')
             downloadhistory.textContent = ''
             for (let obj of list) {

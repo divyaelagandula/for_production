@@ -5,7 +5,7 @@ const expenses=require('../models/expenses') // Use a descriptive variable name
 const checkingUserIsPremiumOrNot = async (req, res) => {
     try {
         // Renaming the result variable to userResult
-        const userResult = await users.findByPk(req.user.id, { raw: true }); 
+        const userResult = await users.findByPk(req.user.userid, { raw: true }); 
         
         console.log('Checking premium status:', userResult);
 

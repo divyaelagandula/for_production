@@ -83,7 +83,7 @@ const getPaymentStatus = async (req, res) => {
 if(orderStatus==='Success'){
   await Users.update(
   { membershipStatus: 'true' }, // The fields to update
-  { where: {id: req.user.id } }  // The condition for the update
+  { where: {id: req.user.userid} }  // The condition for the update
 );
 }
     
